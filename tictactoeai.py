@@ -10,12 +10,11 @@ board = [empty, empty, empty, empty, empty, empty, empty, empty, empty]
 def validateTurn(board, turn):
     return 1
 
-def minimax(board, isMaximising):
+def minimax(board, isMaximising, turn):
 
-    state = checkState(board, 0)
+    state = checkState(board, turn)
 
     if state != stillGoing:
-        print("terminal state")
         return checkState(board, 0)
 
     if isMaximising:
@@ -26,7 +25,7 @@ def minimax(board, isMaximising):
                 continue
             
             board[i] = ai
-            score = minimax(board, False)
+            score = minimax(board, False, i)
             board[i] = empty
             bestScore = max(score, bestScore)
 
@@ -38,7 +37,7 @@ def minimax(board, isMaximising):
                 continue
             
             board[i] = player
-            score = minimax(board, True)
+            score = minimax(board, True, i)
             board[i] = empty
             bestScore = min(score, bestScore)
                 
@@ -53,25 +52,20 @@ def checkState(board, turn):
     diagCheck = [0, 4, 8]
     antidiagCheck = [2, 4, 6]
 
-    #printBoard(board)
-
     #toCheck = [rowCheck, colCheck, diagCheck, antidiagCheck]
+
     toCheck = [[0, 1, 2],[3, 4, 5],[6, 7, 8],[0, 3, 6],[1, 4, 7],[2, 5, 8],[0, 4, 8],[2, 4, 6]]
 
     for i in range(len(toCheck)):
         if board[toCheck[i][0]] == board[toCheck[i][1]] and board[toCheck[i][0]] == board[toCheck[i][2]]:
             if board[toCheck[i][0]] == player:
-                print("PLAYER")
                 return player
             if board[toCheck[i][0]] == ai:
-                print("AI")
                 return ai
             
     for square in board:
         if square == empty:
-            print("STILL GOING")
             return stillGoing
-    print("TIE")
     return tie
     
 def printBoard(board):
@@ -134,8 +128,7 @@ def aiMove(board):
                 continue
             
         board[i] = ai
-        #print(f'analysing ai move {i}')
-        score = minimax(board, False)
+        score = minimax(board, False, i)
         board[i] = empty
 
         if score > bestScore:
@@ -149,7 +142,6 @@ while(True):
     printBoard(board)
     playerTurn = input("Make Turn: ")
     playerTurn = int(playerTurn)
-    print(playerTurn // 3)
     validateTurn(board, playerTurn)
     board[playerTurn] = player
     state = checkState(board, playerTurn)
@@ -167,7 +159,7 @@ while(True):
     aiTurn = aiMove(board)
 
     board[aiTurn] = ai
-    checkState(board, aiTurn)
+    state = checkState(board, aiTurn)
     if state == player:
         print("YAY YOU WON")
         break
